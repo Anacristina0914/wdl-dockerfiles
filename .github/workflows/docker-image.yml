@@ -14,12 +14,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4  
 
-#    - name: Log in to Dockerhub
-#      uses: docker/login-action@v2
-#      with:
-#        username: ${{ secrets.DOCKER_USER }}
-#        password: ${{ secrets.DOCKER_PW }}
-
     - name: Build and push docker images
       env:
         REGISTRY: docker.io/anacgon
@@ -59,11 +53,16 @@ jobs:
           # Build and tag the image using values from build.env
           docker build \
             --build-arg ${IMAGE^^}_VERSION="${VERSION}" \
-            -t $REGISTRY/$IMAGE:$IMAGE_TAG \
-            -t $REGISTRY/$IMAGE:latest \
+            -t $IMAGE:$VERSION \
             docker/$IMAGE
           
-#          # Push images
-#          docker push $REGISTRY/$IMAGE:$IMAGE_TAG
-#          docker push $REGISTRY/$IMAGE:latest
+          # Save image as a tar file
+          docker save -o docker-artifacts/$IMAGE-$VERSION.tar $IMAGE:$VERSION
+        done
+    
+    - name: Upload Docker images as artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-images
+        path: docker-artifacts/*.tar
 
