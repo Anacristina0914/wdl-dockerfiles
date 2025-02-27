@@ -7,7 +7,8 @@ ENV IMAGE_NAME="${IMAGE_NAME}"
 ARG IMAGE_TAG
 ENV IMAGE_TAG="${IMAGE_TAG}"
 
-ARG MINIMAP2_VERSION
+ENV MINIMAP2_VERSION=2.28
+
 RUN wget https://github.com/lh3/minimap2/releases/download/v${MINIMAP2_VERSION}/minimap2-${MINIMAP2_VERSION}.tar.bz2 \
 	&& tar --no-same-owner -jxvf minimap2-${MINIMAP2_VERSION}.tar.bz2 --directory /opt \
 	&& rm minimap2-${MINIMAP2_VERSION}.tar.bz2
