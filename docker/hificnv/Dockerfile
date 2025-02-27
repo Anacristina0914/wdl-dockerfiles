@@ -3,12 +3,19 @@ FROM quay.io/pacbio/pb_wdl_base@sha256:4b889a1f21a6a7fecf18820613cf610103966a932
 LABEL maintainer="Billy Rowell <wrowell@pacb.com>"
 
 ARG IMAGE_NAME
-ENV IMAGE_NAME "${IMAGE_NAME}"
+ENV IMAGE_NAME="${IMAGE_NAME}"
 ARG IMAGE_TAG
-ENV IMAGE_TAG "${IMAGE_TAG}"
+ENV IMAGE_TAG="${IMAGE_TAG}"
 
+# Get version from user input
 ARG HIFICNV_VERSION
-RUN wget https://github.com/PacificBiosciences/HiFiCNV/releases/download/v${HIFICNV_VERSION}/hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu.tar.gz && \
-	tar --no-same-owner -zxvf hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu.tar.gz --directory /opt && \
-	rm hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu.tar.gz
+
+# If no version specified by user retrieve latest
+RUN if [ -z "$HIFICNV_VERSION" ]; then \
+    HIFICNV_VERSION=$(curl -s https://api.github.com/repos/PacificBiosciences/HiFiCNV/releases/latest | jq -r '.tag_name' | sed 's/^v//'); \
+    fi && \
+    wget https://github.com/PacificBiosciences/HiFiCNV/releases/download/v${HIFICNV_VERSION}/hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu.tar.gz && \
+    tar --no-same-owner -zxvf hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu.tar.gz --directory /opt && \
+    rm hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu.tar.gz
+	
 RUN ln -s /opt/hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu/hificnv /usr/local/bin/

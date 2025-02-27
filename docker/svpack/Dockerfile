@@ -3,15 +3,17 @@ FROM quay.io/pacbio/pb_wdl_base@sha256:4b889a1f21a6a7fecf18820613cf610103966a932
 LABEL maintainer="Billy Rowell <wrowell@pacb.com>"
 
 ARG IMAGE_NAME
-ENV IMAGE_NAME "${IMAGE_NAME}"
+ENV IMAGE_NAME="${IMAGE_NAME}"
 ARG IMAGE_TAG
-ENV IMAGE_TAG "${IMAGE_TAG}"
+ENV IMAGE_TAG="${IMAGE_TAG}"
 
 ARG SVPACK_GIT_HASH
 WORKDIR /opt
-RUN git clone https://github.com/PacificBiosciences/svpack.git \
-	&& cd svpack \
-	&& git checkout "${SVPACK_GIT_HASH}" \
-	&& chmod +x /opt/svpack/svpack
-
+RUN if [ -z "$SVPACK_GIT_HASH" ]; then \
+    SVPACK_GIT_HASH=$(curl -s https://api.github.com/repos/PacificBiosciences/svpack/commits/main | jq -r '.sha'); \
+    fi && \
+    git clone https://github.com/PacificBiosciences/svpack.git && \
+    cd svpack && \
+    git checkout "${SVPACK_GIT_HASH}" && \
+    chmod +x /opt/svpack/svpack
 ENV PATH "${PATH}:/opt/svpack"

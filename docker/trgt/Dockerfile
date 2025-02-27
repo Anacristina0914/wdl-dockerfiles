@@ -3,13 +3,17 @@ FROM quay.io/pacbio/pb_wdl_base@sha256:4b889a1f21a6a7fecf18820613cf610103966a932
 LABEL maintainer="Billy Rowell <wrowell@pacb.com>"
 
 ARG IMAGE_NAME
-ENV IMAGE_NAME "${IMAGE_NAME}"
+ENV IMAGE_NAME="${IMAGE_NAME}"
 ARG IMAGE_TAG
-ENV IMAGE_TAG "${IMAGE_TAG}"
+ENV IMAGE_TAG="${IMAGE_TAG}"
 
 ARG TRGT_VERSION
 RUN mkdir /opt/trgt
-RUN wget https://github.com/PacificBiosciences/trgt/releases/download/v${TRGT_VERSION}/trgt-v${TRGT_VERSION}-x86_64-unknown-linux-gnu.tar.gz \
+
+RUN if [ -z "$TRGT_VERSION" ]; then \
+	TRGT_VERSION=$(curl -s https://api.github.com/repos/PacificBiosciences/trgt/releases/latest | jq -r ".tag_name" | sed 's/^v//'); \
+	fi && \
+	wget https://github.com/PacificBiosciences/trgt/releases/download/v${TRGT_VERSION}/trgt-v${TRGT_VERSION}-x86_64-unknown-linux-gnu.tar.gz \
 	&& tar --no-same-owner -zxvf  trgt-v${TRGT_VERSION}-x86_64-unknown-linux-gnu.tar.gz \
 	&& rm trgt-v${TRGT_VERSION}-x86_64-unknown-linux-gnu.tar.gz \
 	&& mv trgt-v${TRGT_VERSION}-x86_64-unknown-linux-gnu/trgt /usr/local/bin/ \
