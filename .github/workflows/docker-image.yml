@@ -19,6 +19,8 @@ jobs:
         REGISTRY: docker.io/anacgon
       run: |
         IMAGES=("hificnv" "hifihla" "paraphrase" "pb-cpg-tools" "pbmm2" "pbsv" "svpack" "yak" "trgt")
+        # Create a folder to store images
+        mkdir -p docker-artifacts  
 
         for IMAGE in "${IMAGES[@]}"; do
           BUILD_ENV_FILE="docker/$IMAGE/build.env"
@@ -55,7 +57,7 @@ jobs:
             --build-arg ${IMAGE^^}_VERSION="${VERSION}" \
             -t $IMAGE:$VERSION \
             docker/$IMAGE
-          
+
           # Save image as a tar file
           docker save -o docker-artifacts/$IMAGE-$VERSION.tar $IMAGE:$VERSION
         done
