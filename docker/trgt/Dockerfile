@@ -10,10 +10,7 @@ ENV IMAGE_TAG="${IMAGE_TAG}"
 ARG TRGT_VERSION
 RUN mkdir /opt/trgt
 
-RUN if [ -z "$TRGT_VERSION" ]; then \
-	TRGT_VERSION=$(curl -s https://api.github.com/repos/PacificBiosciences/trgt/releases/latest | jq -r ".tag_name" | sed 's/^v//'); \
-	fi && \
-	wget https://github.com/PacificBiosciences/trgt/releases/download/v${TRGT_VERSION}/trgt-v${TRGT_VERSION}-x86_64-unknown-linux-gnu.tar.gz \
+RUN wget https://github.com/PacificBiosciences/trgt/releases/download/v${TRGT_VERSION}/trgt-v${TRGT_VERSION}-x86_64-unknown-linux-gnu.tar.gz \
 	&& tar --no-same-owner -zxvf  trgt-v${TRGT_VERSION}-x86_64-unknown-linux-gnu.tar.gz \
 	&& rm trgt-v${TRGT_VERSION}-x86_64-unknown-linux-gnu.tar.gz \
 	&& mv trgt-v${TRGT_VERSION}-x86_64-unknown-linux-gnu/trgt /usr/local/bin/ \

@@ -9,10 +9,7 @@ ENV IMAGE_TAG="${IMAGE_TAG}"
 
 ARG SVPACK_GIT_HASH
 WORKDIR /opt
-RUN if [ -z "$SVPACK_GIT_HASH" ]; then \
-    SVPACK_GIT_HASH=$(curl -s https://api.github.com/repos/PacificBiosciences/svpack/commits/main | jq -r '.sha'); \
-    fi && \
-    git clone https://github.com/PacificBiosciences/svpack.git && \
+RUN git clone https://github.com/PacificBiosciences/svpack.git && \
     cd svpack && \
     git checkout "${SVPACK_GIT_HASH}" && \
     chmod +x /opt/svpack/svpack

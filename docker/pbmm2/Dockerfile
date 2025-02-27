@@ -9,8 +9,5 @@ ENV IMAGE_TAG="${IMAGE_TAG}"
 
 ARG PBMM2_VERSION
 
-RUN if [ -z "$PBMM2_VERSION" ]; then \
-	PBMM2_VERSION=$(curl -s https://api.github.com/repos/PacificBiosciences/pbmm2/releases/latest | jq -r '.tag_name' | sed 's/^v//'); \
-	fi && \
-	wget https://github.com/PacificBiosciences/pbmm2/releases/download/v${PBMM2_VERSION}/pbmm2 --directory-prefix /usr/local/bin/ \
+RUN wget https://github.com/PacificBiosciences/pbmm2/releases/download/v${PBMM2_VERSION}/pbmm2 --directory-prefix /usr/local/bin/ \
 	&& chmod +x /usr/local/bin/pbmm2

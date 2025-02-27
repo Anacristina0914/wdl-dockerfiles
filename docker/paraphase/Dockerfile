@@ -8,10 +8,7 @@ ARG IMAGE_TAG
 ENV IMAGE_TAG="${IMAGE_TAG}"
 
 ARG MINIMAP2_VERSION
-RUN if [ -z "$MINIMAP2_VERSION" ]; then \
-	MINIMAP2_VERSION=$(curl -s https://api.github.com/repos/lh3/minimap2/releases/latest | jq -r ".tag_name" | sed 's/^v//'); \
-	fi && \	
-	wget https://github.com/lh3/minimap2/releases/download/v${MINIMAP2_VERSION}/minimap2-${MINIMAP2_VERSION}.tar.bz2 \
+RUN wget https://github.com/lh3/minimap2/releases/download/v${MINIMAP2_VERSION}/minimap2-${MINIMAP2_VERSION}.tar.bz2 \
 	&& tar --no-same-owner -jxvf minimap2-${MINIMAP2_VERSION}.tar.bz2 --directory /opt \
 	&& rm minimap2-${MINIMAP2_VERSION}.tar.bz2
 RUN cd /opt/minimap2-${MINIMAP2_VERSION} \

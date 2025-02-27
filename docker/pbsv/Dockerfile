@@ -9,8 +9,5 @@ ENV IMAGE_TAG="${IMAGE_TAG}"
 
 ARG PBSV_VERSION
 
-RUN if [ -z "$PBSV_VERSION" ]; then \
-	PBSV_VERSION=$(curl -s https://api.github.com/repos/PacificBiosciences/pbsv/releases/latest | jq -r '.tag_name' | sed 's/^v//'); \
-	fi && \
-	wget https://github.com/PacificBiosciences/pbsv/releases/download/v${PBSV_VERSION}/pbsv --directory-prefix /usr/local/bin/ \
+RUN wget https://github.com/PacificBiosciences/pbsv/releases/download/v${PBSV_VERSION}/pbsv --directory-prefix /usr/local/bin/ \
 	&& chmod +x /usr/local/bin/pbsv

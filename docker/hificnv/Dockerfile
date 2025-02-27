@@ -11,10 +11,7 @@ ENV IMAGE_TAG="${IMAGE_TAG}"
 ARG HIFICNV_VERSION
 
 # If no version specified by user retrieve latest
-RUN if [ -z "$HIFICNV_VERSION" ]; then \
-    HIFICNV_VERSION=$(curl -s https://api.github.com/repos/PacificBiosciences/HiFiCNV/releases/latest | jq -r '.tag_name' | sed 's/^v//'); \
-    fi && \
-    wget https://github.com/PacificBiosciences/HiFiCNV/releases/download/v${HIFICNV_VERSION}/hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu.tar.gz && \
+RUN wget https://github.com/PacificBiosciences/HiFiCNV/releases/download/v${HIFICNV_VERSION}/hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu.tar.gz && \
     tar --no-same-owner -zxvf hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu.tar.gz --directory /opt && \
     rm hificnv-v${HIFICNV_VERSION}-x86_64-unknown-linux-gnu.tar.gz
 	

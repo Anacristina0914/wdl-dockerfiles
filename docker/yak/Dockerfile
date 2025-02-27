@@ -8,10 +8,7 @@ ARG IMAGE_TAG
 ENV IMAGE_TAG="${IMAGE_TAG}"
 
 ARG YAK_VERSION
-RUN if [ -z "$YAK_VERSION" ]; then \
-	YAK_VERSION=$(curl -s https://api.github.com/repos/lh3/yak/releases/latest | jq -r '.tag_name' | sed 's/^v//'); \
-    fi && \
-	wget https://github.com/lh3/yak/archive/refs/tags/v${YAK_VERSION}.tar.gz \
+RUN wget https://github.com/lh3/yak/archive/refs/tags/v${YAK_VERSION}.tar.gz \
 	&& tar --no-same-owner -zxvf v${YAK_VERSION}.tar.gz --directory /opt \
 	&& rm v${YAK_VERSION}.tar.gz
 	

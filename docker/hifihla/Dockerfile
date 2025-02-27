@@ -9,9 +9,6 @@ ENV IMAGE_TAG="${IMAGE_TAG}"
 
 ARG HIFIHLA_VERSION
 
-RUN if [ -z "$HIFIHLA_VERSION" ]; then \
-	HIFIHLA_VERSION=$(curl -s https://api.github.com/repos/PacificBiosciences/hifihla/releases/latest | jq -r ".tag_name" | sed 's/^v//' ); \
-	fi && \
-	wget https://github.com/PacificBiosciences/hifihla/releases/download/v${HIFIHLA_VERSION}/hifihla && \
+RUN wget https://github.com/PacificBiosciences/hifihla/releases/download/v${HIFIHLA_VERSION}/hifihla && \
 	mv hifihla /usr/local/bin/hifihla && \
 	chmod +x /usr/local/bin/hifihla
