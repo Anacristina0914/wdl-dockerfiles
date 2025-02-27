@@ -18,7 +18,7 @@ jobs:
       env:
         REGISTRY: docker.io/anacgon
       run: |
-        IMAGES=("hificnv" "hifihla" "paraphase" "pb-cpg-tools" "pbmm2" "pbsv" "svpack" "yak" "trgt")
+        IMAGES=("hificnv" "hifihla" "paraphase" "pb_cpg_tools" "pbmm2" "pbsv" "svpack" "yak" "trgt")
         # Create a folder to store images
         mkdir -p docker-artifacts  
 
