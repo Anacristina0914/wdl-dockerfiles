@@ -13,13 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4  
+      
     - name: Get Latest Versions
       run: |
         chmod +x retrieve_latest_versions.sh
         source ./retrieve_latest_versions.sh > versions.env
         cat versions.env
+        
     - name: Log in to Dockerhub
-    - uses: actions/login-action@v4
+      uses: actions/login-action@v4
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
