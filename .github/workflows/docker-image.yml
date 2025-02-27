@@ -1,0 +1,50 @@
+name: Build lrseq tools Docker images
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Get Latest Versions
+      run: |
+        chmod +x retrieve_latest_versions.sh
+        source ./retrieve_latest_versions.sh > versions.env
+        cat versions.env
+    - name: Log in to Dockerhub
+    - uses: actions/login-action@v4
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Build and push docker images
+      env:
+        REGISTRY: docker.io/anacgon
+      run: |
+        source versions.env
+        IMAGES=("hificnv", "hifihla", "paraphrase", "pb-cpg-tools", "pbmm2", "pbsv", "svpack", "yak", "trgt")
+
+        # Retrieve versions
+        for IMAGE in "${IMAGES[@]}"; do
+          VERSION_VAR="${IMAGE^^}_VERSION"; VERSION="${!VERSION_VAR}"
+          echo "Building ${IMAGE} version ${VERSION}..."
+          
+          dockerfile="docker/$IMAGE/Dockerfile"
+          if [[ ! -f "$dockerfile" ]]; then
+            echo "Dockerfile for $tool not found. Skipping..."
+            continue
+          fi
+          
+          # Build image
+          docker build --build-arg ${IMAGE^^}_VERSION="${VERSION}" -t $REGISTRY/$IMAGE:$VERSION -t $REGISTRY/$IMAGE:latest docker/$IMAGE
+          docker push $REGISTRY/$IMAGE:$VERSION
+          docker push $REGISTRY/$IMAGE:latest
+        done
+      
