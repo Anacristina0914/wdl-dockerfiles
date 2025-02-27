@@ -7,48 +7,63 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4  
-      
-    - name: Get Latest Versions
-      run: |
-        chmod +x retrieve_latest_versions.sh
-        source ./retrieve_latest_versions.sh > versions.env
-        cat versions.env
-        
+
     - name: Log in to Dockerhub
-      uses: docker/login-action@v4
+      uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USER }}
         password: ${{ secrets.DOCKER_PW }}
-        
+
     - name: Build and push docker images
       env:
-        REGISTRY: docker.io/anacgon/
+        REGISTRY: docker.io/anacgon
       run: |
-        source versions.env
-        IMAGES=("hificnv", "hifihla", "paraphrase", "pb-cpg-tools", "pbmm2", "pbsv", "svpack", "yak", "trgt")
+        IMAGES=("hificnv" "hifihla" "paraphrase" "pb-cpg-tools" "pbmm2" "pbsv" "svpack" "yak" "trgt")
 
-        # Retrieve versions
         for IMAGE in "${IMAGES[@]}"; do
-          VERSION_VAR="${IMAGE^^}_VERSION"; VERSION="${!VERSION_VAR}"
-          echo "Building ${IMAGE} version ${VERSION}..."
-          
-          dockerfile="docker/$IMAGE/Dockerfile"
-          if [[ ! -f "$dockerfile" ]]; then
-            echo "Dockerfile for $tool not found. Skipping..."
+          BUILD_ENV_FILE="docker/$IMAGE/build.env"
+
+          if [[ ! -f "$BUILD_ENV_FILE" ]]; then
+            echo "No build.env found for $IMAGE. Skipping..."
             continue
           fi
           
-          # Build image
-          docker build --build-arg ${IMAGE^^}_VERSION="${VERSION}" -t $REGISTRY/$IMAGE:$VERSION -t $REGISTRY/$IMAGE:latest docker/$IMAGE
-          docker push $REGISTRY/$IMAGE:$VERSION
+          # Source the build.env file
+          set -a  # Export variables automatically
+          source "$BUILD_ENV_FILE"
+          set +a  # Stop exporting variables
+
+          # Extract the version variable dynamically
+          VERSION_VAR="${IMAGE^^}_VERSION"  # Convert image name to uppercase and add _VERSION
+          VERSION="${!VERSION_VAR}"  # Get the value of the dynamically constructed variable name
+
+          if [[ -z "$VERSION" ]]; then
+            echo "Version variable not found for $IMAGE. Skipping..."
+            continue
+          fi
+
+          echo "Building ${IMAGE} version ${VERSION} with tag ${IMAGE_TAG}..."
+
+          dockerfile="docker/$IMAGE/Dockerfile"
+          if [[ ! -f "$dockerfile" ]]; then
+            echo "Dockerfile for $IMAGE not found. Skipping..."
+            continue
+          fi
+          
+          # Build and tag the image using values from build.env
+          docker build \
+            --build-arg ${IMAGE^^}_VERSION="${VERSION}" \
+            -t $REGISTRY/$IMAGE:$IMAGE_TAG \
+            -t $REGISTRY/$IMAGE:latest \
+            docker/$IMAGE
+          
+          # Push images
+          docker push $REGISTRY/$IMAGE:$IMAGE_TAG
           docker push $REGISTRY/$IMAGE:latest
-        done
-      
+
